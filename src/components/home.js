@@ -3,7 +3,8 @@ import {MapContainer} from './map/map-container';
 
 export const Home = () => {
     return (
-        <div>
+        <div style={{position: "relative"}}>
+            
             <MapContainer />
         </div>
     );

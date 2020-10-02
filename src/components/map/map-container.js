@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import axios from 'axios';
 import {Maps} from './map';
 
 const CENTER = [42.43278, 25.64194];
@@ -13,17 +12,15 @@ export const MapContainer = () => {
     }, []);
 
     async function mapEffect(){
-        let response;
+        let data;
 
         try {
-            response = await axios.get('https://disease.sh/v3/covid-19/countries');
+            data = await (await fetch('https://disease.sh/v3/covid-19/countries')).json();
         } catch (e) {
             console.log(`Failed to fetch countries: ${e.message}`, e);
             return;
         }
     
-        const { data = [] } = response;
-        
         setGeoJSON({
             type: 'FeatureCollection',
             features: data.map((country = {}) => {

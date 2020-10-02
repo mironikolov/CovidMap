@@ -1,17 +1,18 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {Map, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../../assets/stylesheets/components/map.scss';
+import {ChartContainer} from '../chart/ChartContainer';
 
 export const Maps = (props) => {
     const mapRef = useRef();
+    const [countryInfo, setCountryInfo] = useState({iso2: 'BGR'});
 
     const mapStyle = {
         height: '100vh',
-        width: '100wh'
+        width: '100vw',
+        zIndex: 0
     };
-
-    console.log(props.geoJSON);
     
     function addGeoJsonLayers(e){
         var L = window.L;
@@ -27,7 +28,8 @@ export const Maps = (props) => {
                       updated,
                       cases,
                       deaths,
-                      recovered
+                      recovered,
+                      todayCases
                     } = properties
                 
                     casesString = `${cases}`;
@@ -45,6 +47,7 @@ export const Maps = (props) => {
                         <span class="icon-marker-tooltip">
                           <h2>${country}</h2>
                           <ul>
+                            <li><strong>New cases:</strong> ${todayCases}</li>
                             <li><strong>Confirmed:</strong> ${cases}</li>
                             <li><strong>Deaths:</strong> ${deaths}</li>
                             <li><strong>Recovered:</strong> ${recovered}</li>
@@ -64,17 +67,24 @@ export const Maps = (props) => {
                     });
                   }
             });
-            geoJsonLayers.addTo(mapRef.current.leafletElement);
-            //todo: images
+            geoJsonLayers.addTo(mapRef.current.leafletElement).on('click', handleClick);
         }
     }
 
+    function handleClick(e){
+      const info = e.sourceTarget.feature.properties.countryInfo;
+      setCountryInfo(info);
+    }
+
     return (
+      <div>
         <Map {...props.mapSettings} ref={mapRef} style={mapStyle} onLoad={addGeoJsonLayers()}>
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             />
         </Map>
+        <ChartContainer countryInfo={countryInfo.iso3}/>
+      </div>
     )
 }
